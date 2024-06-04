@@ -1,18 +1,45 @@
-const model=require("./model/model");
+const User = require("./model/model.js");
+const bcrypt = require("bcrypt");
+const dotenv = require("dotenv");
 
-function signup(data){
-    const newUser = new User({
-        name: "John Doe",
-        username: "johndoe",
-        email: "johndoe@example.com",
-        password: "securePassword" // (Remember to use secure password hashing!)
-      });
-      
-      newUser.save()
-        .then(() => console.log("User created successfully!"))
-        .catch((error) => console.error("Error creating user:", error));
-      
-    
+dotenv.config();
+
+const saltRounds = Number(process.env.saltRounds);
+
+
+
+function signup(data) {
+  const { username, password, name, email } = data;
+
+  User.findOne({ username })
+    .then(user => {
+      if (user) {
+        console.log("This username already exists. Try another.");
+      } else {
+        return bcrypt.hash(password, saltRounds);
+      }
+    })
+    .then(hash => {
+      if (hash) {
+        const newUser = new User({
+          name,
+          username,
+          email,
+          password: hash
+        });
+        return newUser.save();
+      }
+    })
+    .then(() => {
+      console.log("User created successfully!");
+    })
+    .catch(error => {
+      console.error("Error during signup process:", error);
+    });
 }
 
-module.exports=signup;
+
+
+
+module.exports = signup;
+
