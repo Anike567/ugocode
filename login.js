@@ -4,31 +4,23 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-const saltRounds = Number(process.env.SALT_ROUNDS); 
+async function login(data) {
+  const { username, password } = data;
 
-function login(data) {
-    const { username, password } = data;
+  try {
+    const user = await User.findOne({ username });
 
-    User.findOne({ username })
-        .then(user => {
-            if (!user) {
-                console.log("User not found");
-                return;
-            }
-
-
-            return bcrypt.compare(password, user.password)
-                .then(isMatch => {
-                    if (isMatch) {
-                        console.log("Successfully logged in");
-                    } else {
-                        console.log("Invalid password");
-                    }
-                });
-        })
-        .catch(err => {
-            console.log("Error finding user:", err);
-        });
+    if (user) {
+      const match = await bcrypt.compare(password, user.password);
+      return match ? user : false;
+    } else {
+      console.log("User not found, try signing up.");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error finding user:", error);
+    return false;
+  }
 }
 
 module.exports = login;

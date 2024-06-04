@@ -4,42 +4,35 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-const saltRounds = Number(process.env.saltRounds);
+const saltRounds = Number(process.env.SALT_ROUNDS);
 
-
-
-function signup(data) {
+async function signup(data) {
   const { username, password, name, email } = data;
 
-  User.findOne({ username })
-    .then(user => {
-      if (user) {
-        console.log("This username already exists. Try another.");
-      } else {
-        return bcrypt.hash(password, saltRounds);
-      }
-    })
-    .then(hash => {
-      if (hash) {
-        const newUser = new User({
-          name,
-          username,
-          email,
-          password: hash
-        });
-        return newUser.save();
-      }
-    })
-    .then(() => {
-      console.log("User created successfully!");
-    })
-    .catch(error => {
-      console.error("Error during signup process:", error);
-    });
+  try {
+    const user = await User.findOne({ username });
+
+    if (user) {
+      console.log("User already exists");
+      return null;
+    } else {
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      console.log(hashedPassword);
+
+      const newUser = new User({
+        name,
+        username,
+        email,
+        password: hashedPassword
+      });
+
+      await newUser.save();
+      return newUser;
+    }
+  } catch (error) {
+    console.error("Error finding or saving user:", error);
+    return false;
+  }
 }
 
-
-
-
 module.exports = signup;
-

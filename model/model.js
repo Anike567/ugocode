@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
   password: String
 });
 
-// Correction: Use singular model name
 const User = mongoose.model("User", userSchema);
 
 module.exports=User;
