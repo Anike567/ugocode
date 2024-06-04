@@ -1,9 +1,13 @@
+const mongoose = require("mongoose");
 
+const userSchema = new mongoose.Schema({
+  name: String,
+  username: String,
+  email: String,
+  password: String
+});
 
-const userSchema=new mongoose.Schema({
-    name:String,
-    username:String,
-    email:String,
-    password:String
-})
-const User=mongoose.model(Users,userSchema);
+// Correction: Use singular model name
+const User = mongoose.model("User", userSchema);
+
+module.exports=User;
