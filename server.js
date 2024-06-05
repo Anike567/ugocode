@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const connection = require("./con.js");
+const {setUser} = require('./auth.js');
 const signup = require("./signup.js");
 const login = require("./login.js");
 
@@ -25,15 +26,15 @@ app.post("/signup", async (req, res) => {
   try {
     const user = await signup(usercredential);
     if (user === null) {
-      res.status(409).send("This username already exists. Use another one.");
+      res.status(409).json({"error": "This username is already exise use another"});
     } else if (user === false) {
       res.status(500).send("Internal error occurred");
     } else {
       console.log(user);
-      res.status(201).send("Data saved successfully");
+      res.status(201).json({"message": "Data sucessfully inserted"});
     }
   } catch (error) {
-    res.status(500).send("Internal error occurred");
+    res.status(500).json({"error": "Internal Server Error"});
   }
 });
 
@@ -46,12 +47,13 @@ app.post("/login", async (req, res) => {
   try {
     const user = await login(login_credential);
     if (user) {
-      res.status(200).send("Login successful");
+      const token = setUser(user);
+      res.status(200).json({ "message": "Login Successful", token: token });
     } else {
-      res.status(401).send("Invalid username or password");
+      res.status(401).json({ "error": "Invalid username or password" });
     }
   } catch (error) {
-    res.status(500).send("Internal error occurred");
+    res.status(500).json({ "error": "Internal Server Error" });
   }
 });
 

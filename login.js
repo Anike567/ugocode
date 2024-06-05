@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const User = require("./model/model.js");
+const User = require("./model/model");
 const dotenv = require("dotenv");
 
 dotenv.config();

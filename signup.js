@@ -13,11 +13,9 @@ async function signup(data) {
     const user = await User.findOne({ username });
 
     if (user) {
-      console.log("User already exists");
       return null;
     } else {
       const hashedPassword = await bcrypt.hash(password, saltRounds);
-      console.log(hashedPassword);
 
       const newUser = new User({
         name,
